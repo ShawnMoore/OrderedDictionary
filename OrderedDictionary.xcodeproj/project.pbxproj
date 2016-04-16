@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29F0A98D1CC271DC001245C4 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F0A98C1CC271DC001245C4 /* OrderedDictionary.swift */; };
 		29F7B5B21CC1E2E800924A12 /* OrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 29F7B5B11CC1E2E800924A12 /* OrderedDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29F7B5B91CC1E2E800924A12 /* OrderedDictionary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F7B5AE1CC1E2E800924A12 /* OrderedDictionary.framework */; };
 		29F7B5BE1CC1E2E800924A12 /* OrderedDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F7B5BD1CC1E2E800924A12 /* OrderedDictionaryTests.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		29F0A98C1CC271DC001245C4 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderedDictionary.swift; sourceTree = "<group>"; };
 		29F7B5AE1CC1E2E800924A12 /* OrderedDictionary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OrderedDictionary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		29F7B5B11CC1E2E800924A12 /* OrderedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OrderedDictionary.h; sourceTree = "<group>"; };
 		29F7B5B31CC1E2E800924A12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				29F7B5B11CC1E2E800924A12 /* OrderedDictionary.h */,
+				29F0A98C1CC271DC001245C4 /* OrderedDictionary.swift */,
 				29F7B5B31CC1E2E800924A12 /* Info.plist */,
 			);
 			path = OrderedDictionary;
@@ -194,6 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29F0A98D1CC271DC001245C4 /* OrderedDictionary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +314,7 @@
 		29F7B5C31CC1E2E800924A12 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -320,12 +325,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.shawnmoore.OrderedDictionary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		29F7B5C41CC1E2E800924A12 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -378,6 +385,7 @@
 				29F7B5C41CC1E2E800924A12 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		29F7B5C51CC1E2E800924A12 /* Build configuration list for PBXNativeTarget "OrderedDictionaryTests" */ = {
 			isa = XCConfigurationList;
@@ -386,6 +394,7 @@
 				29F7B5C71CC1E2E800924A12 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
