@@ -8,28 +8,28 @@
 
 import Foundation
 
-struct OrderedDictionary<Key: Hashable, Value>: CollectionType {
-    // MARK: - Private Properties
-    private var _keys: [Key] = []
-    private var _dictionary: Dictionary<Key, Value> = [:]
-    
+public struct OrderedDictionary<Key: Hashable, Value>: CollectionType {
     // MARK: - Associated Types
-    typealias Index = DictionaryIndex<Key, Value>
+    public typealias Index = DictionaryIndex<Key, Value>
     
     // MARK: - Type Aliases
-    typealias Element = (Key, Value)
+    public typealias Element = (Key, Value)
     
     // MARK: - Instance Properties
-    var startIndex: Index {
+    public var startIndex: Index {
         return _dictionary.startIndex
     }
     
-    var endIndex: Index {
+    public var endIndex: Index {
         return _dictionary.endIndex
     }
     
+    // MARK: - Private Instance Properties
+    private var _keys: [Key] = []
+    private var _dictionary: Dictionary<Key, Value> = [:]
+    
     // MARK: - Instance Methods
-    func generate() -> AnyGenerator<Element> {
+    public func generate() -> AnyGenerator<Element> {
         var index = 0
         
         return AnyGenerator<Element> {
@@ -43,7 +43,7 @@ struct OrderedDictionary<Key: Hashable, Value>: CollectionType {
     }
     
     // MARK: - Subscripts
-    subscript(index: Index) -> Element {
+    public subscript(index: Index) -> Element {
         return _dictionary[index]
     }
 }
