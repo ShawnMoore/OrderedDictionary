@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct OrderedDictionary<Key: Hashable, Value>: CollectionType {
+public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLiteralConvertible {
     // MARK: - Associated Types
     public typealias Index = DictionaryIndex<Key, Value>
     
@@ -25,8 +25,29 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType {
     }
     
     // MARK: - Private Instance Properties
-    private var _keys: [Key] = []
-    private var _dictionary: Dictionary<Key, Value> = [:]
+    private var _keys: [Key]
+    private var _dictionary: Dictionary<Key, Value>
+    
+    // MARK: - Initializers
+    public init() {
+        _keys = []
+        _dictionary = [:]
+    }
+    
+    public init(dictionaryLiteral elements: Element...) {
+        self.init()
+        
+        for element in elements {
+            _keys.append(element.0)
+            _dictionary[element.0] = element.1
+        }
+    }
+    
+    public init(minimumCapacity: Int) {
+        _keys = []
+        _keys.reserveCapacity(minimumCapacity)
+        _dictionary = Dictionary(minimumCapacity: minimumCapacity)
+    }
     
     // MARK: - Instance Methods
     public func generate() -> AnyGenerator<Element> {
