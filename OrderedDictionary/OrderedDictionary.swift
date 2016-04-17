@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLiteralConvertible {
+public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLiteralConvertible, CustomStringConvertible, CustomDebugStringConvertible {
     // MARK: - Associated Types
     public typealias Index = DictionaryIndex<Key, Value>
     
@@ -22,6 +22,14 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     public var endIndex: Index {
         return _dictionary.endIndex
+    }
+    
+    public var description: String {
+        return "[\(map({ "\($0.0): \($0.1)" }).joinWithSeparator(", "))]"
+    }
+    
+    public var debugDescription: String {
+        return description
     }
     
     // MARK: - Private Instance Properties
