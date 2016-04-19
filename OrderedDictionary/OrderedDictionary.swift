@@ -5,6 +5,7 @@
 //  Created by Shawn Moore on 4/16/16.
 //  Copyright © 2016 Shawn Moore. All rights reserved.
 //
+//  Dictionary Documentation comes from Apple Inc.
 
 import Foundation
 
@@ -16,8 +17,10 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     public typealias Element = (Key, Value)
     
     // MARK: - Instance Properties
+    /// An array containing just the keys of _self_ in order.
     private(set) var keys: [Key]
     
+    /// An array containing just the values of _self_ in order.
     public var values: [Value] {
         return map({$0.1})
     }
@@ -42,6 +45,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     private var _dictionary: Dictionary<Key, Value>
     
     // MARK: - Initializers
+    /// Create an empty dictionary.
     public init() {
         keys = []
         _dictionary = [:]
@@ -56,6 +60,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
     }
     
+    /// Create a dictionary with at least the given number of elements worth of storage. The actual capacity will be the smallest power of 2 that's >= minimumCapacity.
     public init(minimumCapacity: Int) {
         keys = []
         keys.reserveCapacity(minimumCapacity)
@@ -63,6 +68,8 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     // MARK: - Instance Methods
+    
+    /// Returns a generator over the (key, value) pairs.
     public func generate() -> AnyGenerator<Element> {
         var index = 0
         
@@ -76,10 +83,12 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
     }
     
+    /// Returns the Index for the given key, or nil if the key is not present in the dictionary.
     @warn_unused_result func indexForKey(key: Key) -> Index? {
         return _dictionary.indexForKey(key)
     }
     
+    /// If !self.isEmpty, return the first key-value pair in the sequence of elements, otherwise return nil.
     mutating func popFirst() -> Element? {
         guard !self.isEmpty else { return nil }
         
@@ -94,11 +103,13 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return nil
     }
     
+    /// Removes all elements.
     mutating func removeAll(keepCapacity keepCapacity: Bool = false) {
         _dictionary.removeAll(keepCapacity: keepCapacity)
         keys.removeAll(keepCapacity: keepCapacity)
     }
     
+    /// Remove the key-value pair at index.
     mutating func removeAtIndex(index: DictionaryIndex<Key, Value>) -> (Key, Value) {
         let element = _dictionary.removeAtIndex(index)
         
@@ -109,6 +120,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return element
     }
     
+    /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
     mutating func removeValueForKey(key: Key) -> Value? {
         guard let value = _dictionary.removeValueForKey(key) else { return nil }
         
@@ -119,6 +131,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return value
     }
     
+    /// Update the value stored in the dictionary for the given key, or, if the key does not exist, add a new key-value pair to the dictionary.
     mutating func updateValue(value: Value, forKey key: Key) -> Value? {
         let value = _dictionary.updateValue(value, forKey: key)
         
@@ -135,6 +148,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return _dictionary[index]
     }
     
+    /// Access the value associated with the given key.
     subscript (key: Key) -> Value? {
         get {
             return _dictionary[key]
