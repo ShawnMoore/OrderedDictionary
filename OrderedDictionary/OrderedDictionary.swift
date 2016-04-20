@@ -99,7 +99,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         keys.removeAll(keepCapacity: keepCapacity)
     }
     
-    mutating func removeAtIndex(index: DictionaryIndex<Key, Value>) -> (Key, Value) {
+    mutating func removeAtIndex(index: Index) -> Element {
         let element = _dictionary.removeAtIndex(index)
         
         if let index = keys.indexOf(element.0) {
@@ -141,11 +141,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
         set {
             if let value = newValue {
-                _dictionary[key] = value
-                
-                if keys.indexOf(key) == nil {
-                    keys.append(key)
-                }
+                updateValue(value, forKey: key)
             } else {
                 removeValueForKey(key)
             }
