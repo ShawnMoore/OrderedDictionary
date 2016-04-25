@@ -11,7 +11,7 @@ import Foundation
 
 public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLiteralConvertible, CustomStringConvertible, CustomDebugStringConvertible {
     // MARK: - Associated Types
-    public typealias Index = DictionaryIndex<Key, Value>
+    public typealias Index = Int
     
     // MARK: - Type Aliases
     public typealias Element = (Key, Value)
@@ -26,11 +26,11 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     public var startIndex: Index {
-        return _dictionary.startIndex
+        return keys.startIndex
     }
     
     public var endIndex: Index {
-        return _dictionary.endIndex
+        return keys.endIndex
     }
     
     public var description: String {
@@ -85,7 +85,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     /// Returns the Index for the given key, or nil if the key is not present in the dictionary.
     @warn_unused_result func indexForKey(key: Key) -> Index? {
-        return _dictionary.indexForKey(key)
+        return keys.indexOf(key)
     }
     
     /// If !self.isEmpty, return the first key-value pair in the sequence of elements, otherwise return nil.
@@ -110,14 +110,15 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /// Remove the key-value pair at index.
-    mutating func removeAtIndex(index: Index) -> Element {
-        let element = _dictionary.removeAtIndex(index)
+    mutating func removeAtIndex(index: Index) -> Element? {
+        let key = keys[index]
+        let value = _dictionary.removeValueForKey(key)
         
-        if let index = keys.indexOf(element.0) {
-            keys.removeAtIndex(index)
+        if let value = value {
+            return (key, value)
         }
         
-        return element
+        return nil
     }
     
     /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
@@ -145,7 +146,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     // MARK: - Subscripts
     public subscript(index: Index) -> Element {
-        return _dictionary[index]
+        return (keys[index], _dictionary[keys[index]]!)
     }
     
     /// Access the value associated with the given key.

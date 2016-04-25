@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29C7544F1CCBAA8600444233 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F0A98C1CC271DC001245C4 /* OrderedDictionary.swift */; };
 		29F0A98D1CC271DC001245C4 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F0A98C1CC271DC001245C4 /* OrderedDictionary.swift */; };
 		29F7B5B21CC1E2E800924A12 /* OrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 29F7B5B11CC1E2E800924A12 /* OrderedDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29F7B5B91CC1E2E800924A12 /* OrderedDictionary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F7B5AE1CC1E2E800924A12 /* OrderedDictionary.framework */; };
@@ -206,6 +207,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29F7B5BE1CC1E2E800924A12 /* OrderedDictionaryTests.swift in Sources */,
+				29C7544F1CCBAA8600444233 /* OrderedDictionary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
