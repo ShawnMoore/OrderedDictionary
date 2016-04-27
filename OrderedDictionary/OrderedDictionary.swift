@@ -81,6 +81,30 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     // MARK: - Instance Methods
     
+    public mutating func append(value: Value, forKey key: Key) {
+        self.append((key, value))
+    }
+    
+    public mutating func append(x: Element) {
+        guard keys.indexOf(x.0) == nil else { return }
+        
+        keys.append(x.0)
+        _dictionary[x.0] = x.1
+    }
+    
+    /// Append the elements of newElements to self.
+    public mutating func appendContentsOf<C : CollectionType where C.Generator.Element == Element>(newElements: C) {
+        for element in newElements {
+            self.append(element)
+        }
+    }
+    
+    public mutating func appendContentsOf<S : SequenceType where S.Generator.Element == Element>(newElements: S) {
+        for element in newElements {
+            self.append(element)
+        }
+    }
+    
     /// Returns a generator over the (key, value) pairs.
     public func generate() -> AnyGenerator<Element> {
         var index = 0
@@ -98,6 +122,13 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     /// Returns the Index for the given key, or nil if the key is not present in the dictionary.
     @warn_unused_result public func indexForKey(key: Key) -> Index? {
         return keys.indexOf(key)
+    }
+    
+    public mutating func insert(newElement: Element, atIndex i: Int) {
+        guard keys.indexOf(newElement.0) == nil else { return }
+        
+        keys.insert(newElement.0, atIndex: i)
+        _dictionary[newElement.0] = newElement.1
     }
     
     /// If !self.isEmpty, return the first key-value pair in the sequence of elements, otherwise return nil.
@@ -130,20 +161,14 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return nil
     }
     
-    /** 
-    Sort self in-place according to isOrderedBefore.
-     
-    The sorting algorithm is not stable (can change the relative order of elements for which isOrderedBefore does not establish an order).
-     
-    Requires: isOrderedBefore is a strict weak ordering over the elements in self.
-    */
-    public mutating func sortInPlace(isOrderedBefore: (Key, Key) -> Bool) {
-        keys.sortInPlace(isOrderedBefore)
-    }
-    
     public mutating func removeAll(keepCapacity keepCapacity: Bool = false) {
         _dictionary.removeAll(keepCapacity: keepCapacity)
         keys.removeAll(keepCapacity: keepCapacity)
+    }
+    
+    public mutating func removeAtIndex(index: Int) -> Element {
+        let key = keys.removeAtIndex(index)
+        return (key, _dictionary[key]!)
     }
     
     /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
@@ -157,6 +182,26 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return value
     }
     
+    public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
+        for key in keys[subRange.startIndex...subRange.endIndex] {
+            _dictionary.removeValueForKey(key)
+        }
+        keys.removeRange(subRange)
+        
+        self.insertContentsOf(newElements, at: subRange.startIndex)
+    }
+    
+    /** 
+    Sort self in-place according to isOrderedBefore.
+     
+    The sorting algorithm is not stable (can change the relative order of elements for which isOrderedBefore does not establish an order).
+     
+    Requires: isOrderedBefore is a strict weak ordering over the elements in self.
+    */
+    public mutating func sortInPlace(isOrderedBefore: (Key, Key) -> Bool) {
+        keys.sortInPlace(isOrderedBefore)
+    }
+    
     /// Update the value stored in the dictionary for the given key, or, if the key does not exist, add a new key-value pair to the dictionary.
     public mutating func updateValue(value: Value, forKey key: Key) -> Value? {
         let value = _dictionary.updateValue(value, forKey: key)
@@ -167,51 +212,6 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
         
         return value
-    }
-    
-    public mutating func append(x: Element) {
-        guard keys.indexOf(x.0) == nil else { return }
-        
-        keys.append(x.0)
-        _dictionary[x.0] = x.1
-    }
-    
-    public mutating func append(value: Value, forKey key: Key) {
-        self.append((key, value))
-    }
-    
-    public mutating func appendContentsOf<S : SequenceType where S.Generator.Element == Element>(newElements: S) {
-        for element in newElements {
-            self.append(element)
-        }
-    }
-    
-    /// Append the elements of newElements to self.
-    public mutating func appendContentsOf<C : CollectionType where C.Generator.Element == Element>(newElements: C) {
-        for element in newElements {
-            self.append(element)
-        }
-    }
-    
-    public mutating func insert(newElement: Element, atIndex i: Int) {
-        guard keys.indexOf(newElement.0) == nil else { return }
-        
-        keys.insert(newElement.0, atIndex: i)
-        _dictionary[newElement.0] = newElement.1
-    }
-    
-    public mutating func removeAtIndex(index: Int) -> Element {
-        let key = keys.removeAtIndex(index)
-        return (key, _dictionary[key]!)
-    }
-    
-    public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
-        for key in keys[subRange.startIndex...subRange.endIndex] {
-            _dictionary.removeValueForKey(key)
-        }
-        keys.removeRange(subRange)
-        
-        self.insertContentsOf(newElements, at: subRange.startIndex)
     }
     
     // MARK: - Subscripts
