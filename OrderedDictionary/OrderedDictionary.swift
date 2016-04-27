@@ -115,7 +115,32 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return nil
     }
     
-    /// Removes all elements.
+    /// If !self.isEmpty, return the last key-value pair in the sequence of elements, otherwise return nil.
+    public mutating func popLast() -> Element? {
+        guard !self.isEmpty else { return nil }
+        
+        let key = keys.removeLast()
+        
+        if let value = _dictionary[key] {
+            return (key, value)
+        } else {
+            keys.insert(key, atIndex: 0)
+        }
+        
+        return nil
+    }
+    
+    /** 
+    Sort self in-place according to isOrderedBefore.
+     
+    The sorting algorithm is not stable (can change the relative order of elements for which isOrderedBefore does not establish an order).
+     
+    Requires: isOrderedBefore is a strict weak ordering over the elements in self.
+    */
+    public mutating func sortInPlace(isOrderedBefore: (Key, Key) -> Bool) {
+        keys.sortInPlace(isOrderedBefore)
+    }
+    
     public mutating func removeAll(keepCapacity keepCapacity: Bool = false) {
         _dictionary.removeAll(keepCapacity: keepCapacity)
         keys.removeAll(keepCapacity: keepCapacity)
@@ -149,6 +174,10 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         
         keys.append(x.0)
         _dictionary[x.0] = x.1
+    }
+    
+    public mutating func append(value: Value, forKey key: Key) {
+        self.append((key, value))
     }
     
     public mutating func appendContentsOf<S : SequenceType where S.Generator.Element == Element>(newElements: S) {
