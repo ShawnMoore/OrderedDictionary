@@ -121,18 +121,6 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         keys.removeAll(keepCapacity: keepCapacity)
     }
     
-    /// Remove the key-value pair at index.
-    public mutating func removeAtIndex(index: Index) -> Element? {
-        let key = keys[index]
-        let value = _dictionary.removeValueForKey(key)
-        
-        if let value = value {
-            return (key, value)
-        }
-        
-        return nil
-    }
-    
     /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
     public mutating func removeValueForKey(key: Key) -> Value? {
         guard let value = _dictionary.removeValueForKey(key) else { return nil }
@@ -189,7 +177,12 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
-        // TODO:
+        for key in keys[subRange.startIndex...subRange.endIndex] {
+            _dictionary.removeValueForKey(key)
+        }
+        keys.removeRange(subRange)
+        
+        self.insertContentsOf(newElements, at: subRange.startIndex)
     }
     
     // MARK: - Subscripts
