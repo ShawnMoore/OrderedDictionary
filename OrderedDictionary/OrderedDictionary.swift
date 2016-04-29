@@ -45,13 +45,13 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return keys.capacity
     }
     
-    // MARK: - Private Instance Properties
-    private var _dictionary: Dictionary<Key, Value>
+    /// An unordered version of the OrderedDictionary.
+    private(set) var dictionary: Dictionary<Key, Value>
     
     // MARK: - Initializers
     public init() {
         keys = []
-        _dictionary = [:]
+        dictionary = [:]
     }
     
     public init(dictionaryLiteral elements: Element...) {
@@ -59,16 +59,35 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         
         for element in elements {
             keys.append(element.0)
-            _dictionary[element.0] = element.1
+            dictionary[element.0] = element.1
         }
     }
     
-    public init<S : SequenceType where S.Generator.Element == Element>(_ s: S) {
+    /// Creates a collection instance that contains elements.
+    public init<S : SequenceType where S.Generator.Element == Element>(_ s: S, sort: ((Key, Key) -> Bool)? = nil ) {
         self.init()
         
         for element in s {
             keys.append(element.0)
-            _dictionary[element.0] = element.1
+            dictionary[element.0] = element.1
+        }
+        
+        if let sort = sort {
+            keys.sortInPlace(sort)
+        }
+    }
+    
+    /// Creates a collection instance that contains elements.
+    public init<C : CollectionType where C.Generator.Element == Element>(_ c: C, sort: ((Key, Key) -> Bool)? = nil ) {
+        self.init()
+        
+        for element in c {
+            keys.append(element.0)
+            dictionary[element.0] = element.1
+        }
+        
+        if let sort = sort {
+            keys.sortInPlace(sort)
         }
     }
     
@@ -76,7 +95,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     public init(minimumCapacity: Int) {
         keys = []
         keys.reserveCapacity(minimumCapacity)
-        _dictionary = Dictionary(minimumCapacity: minimumCapacity)
+        dictionary = Dictionary(minimumCapacity: minimumCapacity)
     }
     
     // MARK: - Instance Methods
@@ -89,7 +108,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         guard keys.indexOf(x.0) == nil else { return }
         
         keys.append(x.0)
-        _dictionary[x.0] = x.1
+        dictionary[x.0] = x.1
     }
     
     /// Append the elements of newElements to self.
@@ -110,7 +129,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         var index = 0
         
         return AnyGenerator<Element> {
-            if let value = self._dictionary[self.keys[index]] where index < self.keys.count {
+            if let value = self.dictionary[self.keys[index]] where index < self.keys.count {
                 let returnValue = (self.keys[index], value)
                 index += 1
                 return returnValue
@@ -128,7 +147,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         guard keys.indexOf(newElement.0) == nil else { return }
         
         keys.insert(newElement.0, atIndex: i)
-        _dictionary[newElement.0] = newElement.1
+        dictionary[newElement.0] = newElement.1
     }
     
     /// If !self.isEmpty, return the first key-value pair in the sequence of elements, otherwise return nil.
@@ -137,7 +156,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         
         let key = keys.removeFirst()
         
-        if let value = _dictionary[key] {
+        if let value = dictionary[key] {
             return (key, value)
         } else {
             keys.insert(key, atIndex: 0)
@@ -152,7 +171,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         
         let key = keys.removeLast()
         
-        if let value = _dictionary[key] {
+        if let value = dictionary[key] {
             return (key, value)
         } else {
             keys.insert(key, atIndex: 0)
@@ -162,18 +181,18 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     public mutating func removeAll(keepCapacity keepCapacity: Bool = false) {
-        _dictionary.removeAll(keepCapacity: keepCapacity)
+        dictionary.removeAll(keepCapacity: keepCapacity)
         keys.removeAll(keepCapacity: keepCapacity)
     }
     
     public mutating func removeAtIndex(index: Int) -> Element {
         let key = keys.removeAtIndex(index)
-        return (key, _dictionary[key]!)
+        return (key, dictionary[key]!)
     }
     
     /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
     public mutating func removeValueForKey(key: Key) -> Value? {
-        guard let value = _dictionary.removeValueForKey(key) else { return nil }
+        guard let value = dictionary.removeValueForKey(key) else { return nil }
         
         if let index = keys.indexOf(key) {
             keys.removeAtIndex(index)
@@ -184,7 +203,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
         for key in keys[subRange.startIndex...subRange.endIndex] {
-            _dictionary.removeValueForKey(key)
+            dictionary.removeValueForKey(key)
         }
         keys.removeRange(subRange)
         
@@ -204,10 +223,10 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     /// Update the value stored in the dictionary for the given key, or, if the key does not exist, add a new key-value pair to the dictionary.
     public mutating func updateValue(value: Value, forKey key: Key) -> Value? {
-        let value = _dictionary.updateValue(value, forKey: key)
+        let value = dictionary.updateValue(value, forKey: key)
         
         if value == nil {
-            _dictionary[key] = value
+            dictionary[key] = value
             keys.append(key)
         }
         
@@ -216,13 +235,13 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     // MARK: - Subscripts
     public subscript(index: Index) -> Element {
-        return (keys[index], _dictionary[keys[index]]!)
+        return (keys[index], dictionary[keys[index]]!)
     }
     
     /// Access the value associated with the given key.
     public subscript (key: Key) -> Value? {
         get {
-            return _dictionary[key]
+            return dictionary[key]
         }
         set {
             if let value = newValue {
