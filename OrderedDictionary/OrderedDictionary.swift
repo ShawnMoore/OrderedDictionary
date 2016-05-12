@@ -201,6 +201,21 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return value
     }
     
+    public mutating func removeValuesAtRange(range: Range<Index>) -> [Element] {
+        let returnArray = [Element]()
+        
+        let keys = Array(self.keys[range])
+        self.keys.removeRange(range)
+        
+        for key in keys {
+            if let value = self.dictionary.removeValueForKey(key) {
+                
+            }
+        }
+        
+        return returnArray
+    }
+    
     public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
         for key in keys[subRange.startIndex...subRange.endIndex] {
             dictionary.removeValueForKey(key)
@@ -211,7 +226,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /** 
-    Sort self in-place according to isOrderedBefore.
+    Sort _self_ in-place according to isOrderedBefore.
      
     The sorting algorithm is not stable (can change the relative order of elements for which isOrderedBefore does not establish an order).
      
@@ -239,7 +254,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /// Access the value associated with the given key.
-    public subscript (key: Key) -> Value? {
+    public subscript(key: Key) -> Value? {
         get {
             return dictionary[key]
         }
@@ -251,4 +266,26 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
             }
         }
     }
+    
+    public subscript(range: Range<Index>) -> OrderedDictionary<Key, Value> {
+        get {
+            var returnDict = OrderedDictionary<Key, Value>()
+            var keys = self.keys
+            var dict = self.dictionary
+            
+            keys.replaceRange(range, with: [])
+            
+            for key in keys {
+                dict.removeValueForKey(key)
+            }
+            
+            returnDict.keys = Array(self.keys[range])
+            returnDict.dictionary = dict
+            
+            return returnDict
+        }
+    }
+    
+    
+    
 }
