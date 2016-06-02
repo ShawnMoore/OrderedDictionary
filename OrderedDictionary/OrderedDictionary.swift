@@ -288,3 +288,10 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
     }
 }
+
+extension Dictionary {
+    /// Sort the current dictionary
+    public func sort(sort: ((Key, Key) -> Bool)) -> OrderedDictionary<Key, Value> {
+        return OrderedDictionary(self, sort: sort)
+    }
+}
