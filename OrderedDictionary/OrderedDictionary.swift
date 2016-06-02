@@ -201,21 +201,23 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         return value
     }
     
+    /// Removes the elements at the given range. Returns the elements that was removed.
     public mutating func removeValuesAtRange(range: Range<Index>) -> [Element] {
-        let returnArray = [Element]()
+        var returnArray = [Element]()
         
         let keys = Array(self.keys[range])
         self.keys.removeRange(range)
         
         for key in keys {
             if let value = self.dictionary.removeValueForKey(key) {
-                
+                returnArray.append((key,value))
             }
         }
         
         return returnArray
     }
     
+    /// Replaces the elements at the subrange with the provided elements
     public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
         for key in keys[subRange.startIndex...subRange.endIndex] {
             dictionary.removeValueForKey(key)
@@ -285,7 +287,4 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
             return returnDict
         }
     }
-    
-    
-    
 }
