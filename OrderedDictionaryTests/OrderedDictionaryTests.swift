@@ -12,53 +12,73 @@ import XCTest
 class OrderedDictionaryTests: XCTestCase {
     // MARK: - Properties
     // MARK: String
-    var firstEntry_string: (String, String)?
-    var secondEntry_string: (String, String)?
-    var thirdEntry_string: (String, String)?
+    var firstKey_string: String?
+    var firstValue_string: String?
+    var secondKey_string: String?
+    var secondValue_string: String?
+    var thirdKey_string: String?
+    var thirdValue_string: String?
     
     // MARK: Integer
-    var firstEntry_int: (Int, String)?
-    var secondEntry_int: (Int, String)?
-    var thirdEntry_int: (Int, String)?
+    var firstKey_int: Int?
+    var secondKey_int: Int?
+    var thirdKey_int: Int?
     
     // MARK: - Setup
-    func setUpString() {
-        firstEntry_string = ("Key 1", "Value 1")
-        secondEntry_string = ("Key 2", "Value 2")
-        thirdEntry_string = ("Key 3", "Value 3")
-    }
-    
-    func setUpInt() {
-        firstEntry_int = (1, "Value 1")
-        secondEntry_int = (2, "Value 1")
-        thirdEntry_int = (2, "Value 1")
+    override func setUp() {
+        // Setup String
+        firstKey_string = "Key 1"
+        secondKey_string = "Key 2"
+        thirdKey_string = "Key 3"
+        
+        firstValue_string = "Value 1"
+        secondValue_string = "Value 2"
+        thirdValue_string = "Value 3"
+        
+        // Setup Int
+        firstKey_int = 1
+        secondKey_int = 2
+        thirdKey_int = 3
     }
     
     // MARK: - Tear Down
     override func tearDown() {
         // String
-        firstEntry_string = nil
-        secondEntry_string = nil
-        thirdEntry_string = nil
+        firstKey_string = nil
+        firstKey_string = nil
+        secondKey_string = nil
+        secondValue_string = nil
+        thirdValue_string = nil
+        thirdKey_string = nil
         
         // Int
-        firstEntry_int = nil
-        secondEntry_int = nil
-        thirdEntry_int = nil
+        firstKey_int = nil
+        secondKey_int = nil
+        thirdKey_int = nil
         
         super.tearDown()
     }
     
-    // MARK: - Tests
-    
-    
-    // MARK: - Private Helper Functions
-    /// A derivative over the provided setUp function but without initializing every single property every single time. Allows multiple setUps to simplify initilization.
-    private func test(setUp setUp: ()->()..., test: ()->()) {
-        for setUp in setUp {
-            setUp()
-        }
-        test()
+    // MARK: - Init Tests
+    func testEmptyInit() {
+        let dict = OrderedDictionary<Int,String>()
+        
+        // Verify count
+        XCTAssertEqual(dict.count, 0, "Init() -> Empty Dictionary was not empty")
+        XCTAssertEqual(dict.keys.count, 0, "Init() -> Empty Dictionary keys were not empty")
+        XCTAssertEqual(dict.values.count, 0, "Init() -> Empty Dictionary values were not empty")
     }
     
+    func testDictionaryLiteralInit() {
+        let dict: OrderedDictionary = [firstKey_int!: firstValue_string!]
+        
+        // Verify count
+        XCTAssertEqual(dict.count, 1, "Init(elements: Element...) -> Dictionary did not contain element")
+        XCTAssertEqual(dict.keys.count, 1, "Init(elements: Element...) -> Dictionary keys did not contain a key")
+        XCTAssertEqual(dict.values.count, 1, "Init(elements: Element...) -> Dictionary keys did not contain a value")
+        
+        // Verify element
+        XCTAssertEqual(dict.first!.0, firstKey_int!, "Init(elements: Element...) -> Keys did not match")
+        XCTAssertEqual(dict.first!.1, firstValue_string!, "Init(elements: Element...) -> Values did not match")
+    }
 }
