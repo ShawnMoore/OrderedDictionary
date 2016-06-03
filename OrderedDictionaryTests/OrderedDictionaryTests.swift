@@ -12,17 +12,17 @@ import XCTest
 class OrderedDictionaryTests: XCTestCase {
     // MARK: - Properties
     // MARK: String
-    var firstKey_string: String?
-    var firstValue_string: String?
-    var secondKey_string: String?
-    var secondValue_string: String?
-    var thirdKey_string: String?
-    var thirdValue_string: String?
+    var firstKey_string: String!
+    var firstValue_string: String!
+    var secondKey_string: String!
+    var secondValue_string: String!
+    var thirdKey_string: String!
+    var thirdValue_string: String!
     
     // MARK: Integer
-    var firstKey_int: Int?
-    var secondKey_int: Int?
-    var thirdKey_int: Int?
+    var firstKey_int: Int!
+    var secondKey_int: Int!
+    var thirdKey_int: Int!
     
     // MARK: - Setup
     override func setUp() {
@@ -70,7 +70,7 @@ class OrderedDictionaryTests: XCTestCase {
     }
     
     func testDictionaryLiteralInit() {
-        let dict: OrderedDictionary = [firstKey_int!: firstValue_string!]
+        let dict: OrderedDictionary = [firstKey_int: firstValue_string]
         
         // Verify count
         XCTAssertEqual(dict.count, 1, "Init(elements: Element...) -> Dictionary did not contain element")
@@ -78,7 +78,28 @@ class OrderedDictionaryTests: XCTestCase {
         XCTAssertEqual(dict.values.count, 1, "Init(elements: Element...) -> Dictionary keys did not contain a value")
         
         // Verify element
-        XCTAssertEqual(dict.first!.0, firstKey_int!, "Init(elements: Element...) -> Keys did not match")
-        XCTAssertEqual(dict.first!.1, firstValue_string!, "Init(elements: Element...) -> Values did not match")
+        XCTAssertEqual(dict.first!.0, firstKey_int, "Init(elements: Element...) -> Keys did not match")
+        XCTAssertEqual(dict.first!.1, firstValue_string, "Init(elements: Element...) -> Values did not match")
+    }
+    
+    func testCollectionInit() {
+        let originalDict = [firstKey_int: firstValue_string]
+        let dict = OrderedDictionary(originalDict)
+        
+        // Verify count
+        XCTAssertEqual(dict.count, 1, "Init(c: C) -> Dictionary did not contain element")
+        XCTAssertEqual(dict.keys.count, 1, "Init(c: C) -> Dictionary keys did not contain a key")
+        XCTAssertEqual(dict.values.count, 1, "Init(c: C) -> Dictionary keys did not contain a value")
+        
+        // Verify element
+        XCTAssertEqual(dict.first!.0, firstKey_int, "Init(c: C) -> Keys did not match")
+        XCTAssertEqual(dict.first!.1, firstValue_string, "Init(c: C) -> Values did not match")
+    }
+    
+    func testMinimumCapacityInit() {
+        let dict = OrderedDictionary<String, String>(minimumCapacity: 1)
+        
+        // Verify Capacity
+        XCTAssertEqual(dict.capacity, 1, "Init(minimumCapacity: Int) -> Dictionary did not have correct capacity")
     }
 }
