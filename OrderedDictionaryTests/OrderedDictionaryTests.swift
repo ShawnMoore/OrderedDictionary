@@ -102,4 +102,11 @@ class OrderedDictionaryTests: XCTestCase {
         // Verify Capacity
         XCTAssertEqual(dict.capacity, 1, "Init(minimumCapacity: Int) -> Dictionary did not have correct capacity")
     }
+    
+    // MARK: - Sequence Tests
+    func testDictionaryLiteralSequence() {
+        let dict: OrderedDictionary = [secondKey_int: firstValue_string, firstKey_int: secondValue_string]
+        
+        
+    }
 }
