@@ -269,14 +269,14 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
     }
     
-    public subscript(keys: Key...) -> [Value?] {
-        var returnArray = [Value?]()
+    public subscript(keys: Key...) -> OrderedDictionary<Key, Value> {
+        var dict = OrderedDictionary<Key, Value>()
         
         for key in keys {
-            returnArray.append(self[key])
+            dict[key] = self[key]
         }
         
-        return returnArray
+        return dict
     }
     
     public subscript(range: Range<Index>) -> OrderedDictionary<Key, Value> {
