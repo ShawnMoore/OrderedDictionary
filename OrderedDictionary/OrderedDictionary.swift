@@ -9,7 +9,8 @@
 
 import Foundation
 
-public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, DictionaryLiteralConvertible, CustomStringConvertible, CustomDebugStringConvertible, RangeReplaceableCollectionType {
+public struct OrderedDictionary<Key: Hashable, Value>: Collection, ExpressibleByDictionaryLiteral, CustomStringConvertible, CustomDebugStringConvertible, RangeReplaceableCollection {
+
     // MARK: - Associated Types
     public typealias Index = Int
     
@@ -21,7 +22,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     private(set) var keys: [Key]
     
     /// An array containing just the values of _self_ in order.
-    public var values: [Value] {
+    var values: [Value] {
         return map({$0.1})
     }
     
@@ -34,7 +35,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     public var description: String {
-        return "[\(map({ "\($0.0): \($0.1)" }).joinWithSeparator(", "))]"
+        return "[\(map({ "\($0.0): \($0.1)" }).joined(separator: ", "))]"
     }
     
     public var debugDescription: String {
@@ -64,7 +65,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /// Creates a collection instance that contains elements.
-    public init<S : SequenceType where S.Generator.Element == Element>(_ s: S, sort: ((Key, Key) -> Bool)? = nil ) {
+    public init<S : Sequence>(_ s: S, sort: ((Key, Key) -> Bool)? = nil ) where S.Iterator.Element == Element {
         self.init()
         
         for element in s {
@@ -73,12 +74,12 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
         
         if let sort = sort {
-            keys.sortInPlace(sort)
+            keys.sort(by: sort)
         }
     }
     
     /// Creates a collection instance that contains elements.
-    public init<C : CollectionType where C.Generator.Element == Element>(_ c: C, sort: ((Key, Key) -> Bool)? = nil ) {
+    public init<C : Collection>(_ c: C, sort: ((Key, Key) -> Bool)? = nil ) where C.Iterator.Element == Element {
         self.init()
         
         for element in c {
@@ -87,7 +88,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
         
         if let sort = sort {
-            keys.sortInPlace(sort)
+            keys.sort(by: sort)
         }
     }
     
@@ -100,36 +101,36 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     
     // MARK: - Instance Methods
     
-    public mutating func append(value: Value, forKey key: Key) {
+    public mutating func append(_ value: Value, forKey key: Key) {
         self.append((key, value))
     }
     
-    public mutating func append(x: Element) {
-        guard keys.indexOf(x.0) == nil else { return }
+    public mutating func append(_ x: Element) {
+        guard keys.index(of: x.0) == nil else { return }
         
         keys.append(x.0)
         dictionary[x.0] = x.1
     }
     
     /// Append the elements of newElements to self.
-    public mutating func appendContentsOf<C : CollectionType where C.Generator.Element == Element>(newElements: C) {
+    public mutating func appendContentsOf<C : Collection>(_ newElements: C) where C.Iterator.Element == Element {
         for element in newElements {
             self.append(element)
         }
     }
     
-    public mutating func appendContentsOf<S : SequenceType where S.Generator.Element == Element>(newElements: S) {
+    public mutating func append<S : Sequence>(contentsOf newElements: S) where S.Iterator.Element == Element {
         for element in newElements {
             self.append(element)
         }
     }
     
     /// Returns a generator over the (key, value) pairs.
-    public func generate() -> AnyGenerator<Element> {
+    public func makeIterator() -> AnyIterator<Element> {
         var index = 0
         
-        return AnyGenerator<Element> {
-            if let value = self.dictionary[self.keys[index]] where index < self.keys.count {
+        return AnyIterator<Element> {
+            if let value = self.dictionary[self.keys[index]], index < self.keys.count {
                 let returnValue = (self.keys[index], value)
                 index += 1
                 return returnValue
@@ -139,14 +140,14 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /// Returns the Index for the given key, or nil if the key is not present in the dictionary.
-    @warn_unused_result public func indexForKey(key: Key) -> Index? {
-        return keys.indexOf(key)
+    public func indexForKey(_ key: Key) -> Index? {
+        return keys.index(of: key)
     }
     
-    public mutating func insert(newElement: Element, atIndex i: Int) {
-        guard keys.indexOf(newElement.0) == nil else { return }
+    public mutating func insert(_ newElement: Element, at i: Int) {
+        guard keys.index(of: newElement.0) == nil else { return }
         
-        keys.insert(newElement.0, atIndex: i)
+        keys.insert(newElement.0, at: i)
         dictionary[newElement.0] = newElement.1
     }
     
@@ -159,7 +160,7 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         if let value = dictionary[key] {
             return (key, value)
         } else {
-            keys.insert(key, atIndex: 0)
+            keys.insert(key, at: 0)
         }
         
         return nil
@@ -174,42 +175,42 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         if let value = dictionary[key] {
             return (key, value)
         } else {
-            keys.insert(key, atIndex: 0)
+            keys.insert(key, at: 0)
         }
         
         return nil
     }
     
-    public mutating func removeAll(keepCapacity keepCapacity: Bool = false) {
-        dictionary.removeAll(keepCapacity: keepCapacity)
-        keys.removeAll(keepCapacity: keepCapacity)
+    public mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
+        dictionary.removeAll(keepingCapacity: keepCapacity)
+        keys.removeAll(keepingCapacity: keepCapacity)
     }
     
-    public mutating func removeAtIndex(index: Int) -> Element {
-        let key = keys.removeAtIndex(index)
+    public mutating func remove(at index: Int) -> Element {
+        let key = keys.remove(at: index)
         return (key, dictionary[key]!)
     }
     
     /// Remove a given key and the associated value from the dictionary. Returns the value that was removed, or nil if the key was not present in the dictionary.
-    public mutating func removeValueForKey(key: Key) -> Value? {
-        guard let value = dictionary.removeValueForKey(key) else { return nil }
+    public mutating func removeValueForKey(_ key: Key) -> Value? {
+        guard let value = dictionary.removeValue(forKey: key) else { return nil }
         
-        if let index = keys.indexOf(key) {
-            keys.removeAtIndex(index)
+        if let index = keys.index(of: key) {
+            keys.remove(at: index)
         }
         
         return value
     }
     
     /// Removes the elements at the given range. Returns the elements that was removed.
-    public mutating func removeValuesAtRange(range: Range<Index>) -> [Element] {
+    public mutating func removeValuesAtRange(_ range: Range<Index>) -> [Element] {
         var returnArray = [Element]()
         
         let keys = Array(self.keys[range])
-        self.keys.removeRange(range)
+        self.keys.removeSubrange(range)
         
         for key in keys {
-            if let value = self.dictionary.removeValueForKey(key) {
+            if let value = self.dictionary.removeValue(forKey: key) {
                 returnArray.append((key,value))
             }
         }
@@ -218,13 +219,22 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
     
     /// Replaces the elements at the subrange with the provided elements
-    public mutating func replaceRange<C : CollectionType where C.Generator.Element == Element>(subRange: Range<Int>, with newElements: C) {
-        for key in keys[subRange.startIndex...subRange.endIndex] {
-            dictionary.removeValueForKey(key)
+    public mutating func replaceSubrange<C : Collection>(_ subRange: Range<Int>, with newElements: C) where C.Iterator.Element == Element {
+        for key in keys[subRange.lowerBound...subRange.upperBound] {
+            dictionary.removeValue(forKey: key)
         }
-        keys.removeRange(subRange)
+        keys.removeSubrange(subRange)
         
-        self.insertContentsOf(newElements, at: subRange.startIndex)
+        self.insert(contentsOf: newElements, at: subRange.lowerBound)
+    }
+    
+    /// Returns the position immediately after the given index.
+    ///
+    /// - Parameter i: A valid index of the collection. `i` must be less than
+    ///   `endIndex`.
+    /// - Returns: The index value immediately after `i`.
+    public func index(after i: Int) -> Int {
+        return i + 1
     }
     
     /** 
@@ -234,12 +244,12 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
      
     Requires: isOrderedBefore is a strict weak ordering over the elements in self.
     */
-    public mutating func sortInPlace(isOrderedBefore: (Key, Key) -> Bool) {
-        keys.sortInPlace(isOrderedBefore)
+    public mutating func sortInPlace(_ isOrderedBefore: (Key, Key) -> Bool) {
+        keys.sort(by: isOrderedBefore)
     }
     
     /// Update the value stored in the dictionary for the given key, or, if the key does not exist, add a new key-value pair to the dictionary.
-    public mutating func updateValue(value: Value, forKey key: Key) -> Value? {
+    public mutating func updateValue(_ value: Value, forKey key: Key) -> Value? {
         let value = dictionary.updateValue(value, forKey: key)
         
         if value == nil {
@@ -262,9 +272,9 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
         }
         set {
             if let value = newValue {
-                updateValue(value, forKey: key)
+                _ = updateValue(value, forKey: key)
             } else {
-                removeValueForKey(key)
+                _ = removeValueForKey(key)
             }
         }
     }
@@ -285,10 +295,10 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
             var keys = self.keys
             var dict = self.dictionary
             
-            keys.replaceRange(range, with: [])
+            keys.replaceSubrange(range, with: [])
             
             for key in keys {
-                dict.removeValueForKey(key)
+                dict.removeValue(forKey: key)
             }
             
             returnDict.keys = Array(self.keys[range])
@@ -299,9 +309,9 @@ public struct OrderedDictionary<Key: Hashable, Value>: CollectionType, Dictionar
     }
 }
 
-extension Dictionary {
-    /// Sort the current dictionary
-    public func sort(sort: ((Key, Key) -> Bool)) -> OrderedDictionary<Key, Value> {
-        return OrderedDictionary(self, sort: sort)
-    }
-}
+//extension Dictionary {
+//    /// Sort the current dictionary
+//    public func sort(_ sort: @escaping ((Key, Key) -> Bool)) -> OrderedDictionary<Key, Value> {
+//        return OrderedDictionary(self, sort: sort)
+//    }
+//}
